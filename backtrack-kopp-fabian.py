@@ -34,14 +34,26 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
   	# Initialize stack data structure to contain lists of (variable, value, flag)
   	# flag is 0 if one value has been tried, 1 when both values have been tried
   	stack = [(1, 0, 0)]
-
+  	clauses = []
+	clause_truth_values = []
+	assigned_vals = []
   	while len(stack) <= var_num:
+  		print "START OF LOOP"
+  		del clauses[:]
+  		del clause_truth_values[:]
+  		del assigned_vals[:]
 		clauses = []
 		clause_truth_values = []
+		assigned_vals = []
 
+		#Identify known values
 		for i, line in enumerate(temp_values):
 			#print line
-			clauses.append(line)
+			#print "  Temp Value for Line before append:"
+			#print "  " + str(temp_values[i])
+			clauses.append(line[:])
+			#print "  New Clause Line:"
+			#print "  " + str(clauses[i])
 			for j, variable in enumerate(line):
 				assigned_vals = [x[0] for x in stack] 
 				if abs(int(variable)) in assigned_vals:
@@ -50,12 +62,16 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 					else:
 						clauses[i][j] = stack[abs(int(variable))-1][1]
 
+		print "  Known variables converted:"
+		print "  " + str(clauses)
 		# Identify unknown values as -1
 		for i, line in enumerate(clauses):
 			for j, variable in enumerate(line):
-				print variable
+				#print variable
 				if variable != 0 and variable != 1:
 					clauses[i][j] = -1
+		print "  Unknown variables converted:"
+		print "  " + str(clauses)
 
 		clause_truth_values = verify(clauses, clause_truth_values)
 
@@ -70,8 +86,8 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 
 		if satisfied == 1:
 			#print clauses
-			print clause_truth_values
-			print stack
+			#print clause_truth_values
+			#print stack
 			print "SUCCESS"
 			return
 		elif failed == 1:
@@ -79,10 +95,12 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 			return
 		else:
 			stack.append((len(stack)+1,0,0))
+		print "END OF LOOP\n"
+
 
 
 def verify(clauses, clause_truth_values):
-	print clauses
+	#print clauses
 	for i, line in enumerate(clauses):
 		clause_truth_values.append(0)
 		for j, variable in enumerate(line):
@@ -90,6 +108,8 @@ def verify(clauses, clause_truth_values):
 				clause_truth_values[i] = -1
 			else:
 				clause_truth_values[i] = clause_truth_values[i] | variable
+	print "  Clause values computed:"
+	print "  " + str(clause_truth_values)
 	return clause_truth_values
 
 
