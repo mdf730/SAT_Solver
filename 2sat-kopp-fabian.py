@@ -14,48 +14,75 @@ def try_values(temp_values, clause_num, var_num):
       graph[i] = ""
 
   for clause in temp_values:
+
+    #print clause[0] + "," + clause[1] + " should map "
+    #print "   " + str(-1*int(clause[0])) + " --> " + clause[1]
+    #print "   " + str(-1*int(clause[1])) + " --> " + clause[0]
+    #print str(-1*int(clause[0])) + " before: " + graph[-1*int(clause[0])]
+    #print str(-1*int(clause[1])) + " before: " + graph[-1*int(clause[1])]
+
     temp1 = graph[-1*int(clause[0])] + clause[1] + " "
     graph[-1*int(clause[0])] = temp1
 
     temp2 = graph[-1*int(clause[1])] + clause[0]  + " "
     graph[-1*int(clause[1])] = temp2
 
+    #print str(-1*int(clause[0])) + " after: " + graph[-1*int(clause[0])]
+    #print str(-1*int(clause[1])) + " after: " + graph[-1*int(clause[1])]
+    #print
+    #print
   for i in range(-1*int(var_num), int(var_num) + 1):
     if i != 0:
       graph[i] = graph[i].split()
 
-#  for i in range(-1*int(var_num), int(var_num) + 1):
-#    if i == 0:
-#      continue
-#    print str(i) + " -->", 
-#    print graph[i]
-
   for i in range(-1*int(var_num), int(var_num) + 1):
-    if i == 0: 
+    if i == 0:
       continue
+ #   print str(i) + " -->", 
+ #   print graph[i]
+
+
+
+  #for i in range(-1*int(var_num), int(var_num) + 1):
+  #  if i == 0: 
+  #    continue
+
+  for i in [-1*int(var_num), int(var_num)]:
     i_opp = -1 * i
+
     marked = []            # list of nodes that have already been checked
     frontier = []          # stack of nodes to be checked 
     frontier.append(i)     # add starting value to check for
-  
-    while (frontier):
-      node = frontier.pop()
-      visited = False
 
-      # check if current node has already been visited
-      for it in marked:
-        if node == it:
-          visited = True
-      # check if current node has destination node as a neighbor
-      if visited == False:
-        for it in graph[node]:
-          if int(it) == i_opp:
-            print "U"
-            return
-        marked.append(node)
-        for it in graph[node]:
-          frontier.append(int(it))
-  print "S"
+
+    while (frontier):
+        node = frontier.pop()
+        visited = False
+
+        # check if current node has already been visited
+        for it in marked:
+          if node == it:
+            visited = True
+
+        # check if current node has destination node as a neighbor
+        if visited == False:
+          dead_end = False
+          for it in graph[node]:
+            dead_end = False
+            if int(it) == i_opp:
+              dead_end = True
+              break
+          if dead_end == True:
+            break
+
+          marked.append(node)
+          for it in graph[node]:
+            frontier.append(int(it))
+        if len(marked) == var_num:
+          print marked
+          print "S"
+          return
+  print "U"
 
 fs = open(sys.argv[1], 'r+') # open designated file
 
