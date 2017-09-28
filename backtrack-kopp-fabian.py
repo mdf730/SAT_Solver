@@ -33,12 +33,14 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 
   	# Initialize stack data structure to contain lists of (variable, value, flag)
   	# flag is 0 if one value has been tried, 1 when both values have been tried
-  	stack = [(1, 0, 0)]
+  	stack = [[1, 0, 0]]
   	clauses = []
 	clause_truth_values = []
 	assigned_vals = []
   	while len(stack) <= var_num:
   		print "START OF LOOP"
+  		print "  Stack:"
+  		print "  " + str(stack)
   		del clauses[:]
   		del clause_truth_values[:]
   		del assigned_vals[:]
@@ -92,12 +94,28 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 			return
 		elif failed == 1:
 			print "GO BACK"
-			return
+			if stack[len(stack)-1][2] == 0:
+				stack[len(stack)-1][2] = 1
+				stack[len(stack)-1][1] = flip(stack[len(stack)-1][1])
+			else:
+				stack = backtrack(stack)
 		else:
-			stack.append((len(stack)+1,0,0))
+			stack.append([len(stack)+1,0,0])
 		print "END OF LOOP\n"
 
-
+def backtrack(stack):
+	stack.pop()
+	if len(stack) == 0:
+		print "UNSATISFIABLE"
+		return [-1]
+	else:
+		if stack[len(stack)-1][2] == 0:
+			stack[len(stack)-1][2] = 1
+			stack[len(stack)-1][1] = flip(stack[len(stack)-1][1])
+		else:
+			stack = backtrack(stack)
+			
+	return stack
 
 def verify(clauses, clause_truth_values):
 	#print clauses
