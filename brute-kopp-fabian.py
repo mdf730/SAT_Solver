@@ -71,7 +71,13 @@ def try_values(temp_values, clause_num, var_num, prob_num, max_lit_num, expected
   unsat_num = unsat_num + 1
   print output
 
-fs = open(sys.argv[1], 'r+') # open designated file
+cnf_name = sys.argv[1]
+fs = open(cnf_name, 'r+') # open designated file
+
+
+csv_name = cnf_name[0:len(cnf_name)-4] + ".csv"
+sys.stdout=open(csv_name,"w")
+
 clause_num = 0
 counter = 0
 wff_num = 0
@@ -97,4 +103,5 @@ for line in fs:
       counter = counter + 1
      
 try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected)
-print sys.argv[1].strip(".cnf") + "," + "Kopp-Fabian" + "," + str(wff_num) + "," + str(sat_num) + "," + str(unsat_num) + "," + str(ans_prov) + "," + str(correct_num)
+print sys.argv[1].strip(".cnf") + "," + "kopp-fabian" + "," + str(wff_num) + "," + str(sat_num) + "," + str(unsat_num) + "," + str(ans_prov) + "," + str(correct_num)
+sys.stdout.close()
