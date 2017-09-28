@@ -74,7 +74,6 @@ def try_values(temp_values, clause_num, var_num, prob_num, max_lit_num, expected
 cnf_name = sys.argv[1]
 fs = open(cnf_name, 'r+') # open designated file
 
-
 csv_name = cnf_name[0:len(cnf_name)-4] + ".csv"
 sys.stdout=open(csv_name,"w")
 
