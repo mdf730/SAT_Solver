@@ -23,13 +23,15 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
   	global unsat_num
   	global ans_prov
  	global correct_num
+ 	start_time = time.time() 
+ 	agreement = 0
 
-  	print "Temp values: " + str(temp_values)
-  	print "clause_num: " + str(clause_num)
-  	print "var_num: " + str(var_num)
-  	print "prob_num: " + str(prob_num)
-  	print "lit_num: " + str(lit_num)
-  	print "expected: " + str(expected)
+  	#print "Temp values: " + str(temp_values)
+  	#print "clause_num: " + str(clause_num)
+  	#print "var_num: " + str(var_num)
+  	#print "prob_num: " + str(prob_num)
+  	#print "lit_num: " + str(lit_num)
+  	#print "expected: " + str(expected)
 
   	# Initialize stack data structure to contain lists of (variable, value, flag)
   	# flag is 0 if one value has been tried, 1 when both values have been tried
@@ -38,15 +40,16 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 	clause_truth_values = []
 	assigned_vals = []
   	while len(stack) <= var_num:
-  		print "START OF LOOP"
-  		print "  Stack:"
-  		print "  " + str(stack)
+  		#print "START OF LOOP"
+  		#print "  Stack:"
+  		#print "  " + str(stack)
   		del clauses[:]
   		del clause_truth_values[:]
   		del assigned_vals[:]
 		clauses = []
 		clause_truth_values = []
 		assigned_vals = []
+	 	tot_lit_num = 0
 
 		#Identify known values
 		for i, line in enumerate(temp_values):
@@ -57,6 +60,7 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 			#print "  New Clause Line:"
 			#print "  " + str(clauses[i])
 			for j, variable in enumerate(line):
+				tot_lit_num = tot_lit_num + 1
 				assigned_vals = [x[0] for x in stack] 
 				if abs(int(variable)) in assigned_vals:
 					if int(variable) < 0:
@@ -64,16 +68,16 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 					else:
 						clauses[i][j] = stack[abs(int(variable))-1][1]
 
-		print "  Known variables converted:"
-		print "  " + str(clauses)
+		#print "  Known variables converted:"
+		#print "  " + str(clauses)
 		# Identify unknown values as -1
 		for i, line in enumerate(clauses):
 			for j, variable in enumerate(line):
 				#print variable
 				if variable != 0 and variable != 1:
 					clauses[i][j] = -1
-		print "  Unknown variables converted:"
-		print "  " + str(clauses)
+		#print "  Unknown variables converted:"
+		#print "  " + str(clauses)
 
 		clause_truth_values = verify(clauses, clause_truth_values)
 
@@ -90,31 +94,66 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 			#print clauses
 			#print clause_truth_values
 			#print stack
-			print "SUCCESS"
+			#print "SUCCESS"
+			exec_time = time.time() - start_time
+			if expected.strip() =="S":
+				agreement = 1
+				ans_prov = ans_prov + 1
+				correct_num = correct_num + 1
+			elif expected.strip() == "U":
+				agreement = -1
+				ans_prov = ans_prov + 1
+			else:
+				agreement = 0
+			output = str(prob_num) + "," + str(var_num) + "," + str(clause_num) + "," + str(lit_num) + "," + str(tot_lit_num)
+			output = output +  "," + "S" + "," + str(agreement) + "," + str(round(exec_time,2))
+			for i in range(var_num):
+				if i < len(stack):
+					output = output + "," + str(stack[i][1])
+				else:
+					output = output + ",?"
+			print output
+			sat_num = sat_num + 1
 			return
 		elif failed == 1:
-			print "GO BACK"
+			#print "GO BACK"
 			if stack[len(stack)-1][2] == 0:
 				stack[len(stack)-1][2] = 1
 				stack[len(stack)-1][1] = flip(stack[len(stack)-1][1])
 			else:
 				stack = backtrack(stack)
+				if stack == -1:
+					exec_time = time.time() - start_time
+					if expected.strip() =="S":
+						agreement = -1
+						ans_prov = ans_prov + 1
+					elif expected.strip() == "U":
+						agreement = 1
+						ans_prov = ans_prov + 1
+						correct_num = correct_num + 1
+					else:
+						agreement = 0
+					output = str(prob_num) + "," + str(var_num) + "," + str(clause_num) + "," + str(lit_num) + "," + str(tot_lit_num)
+					output = output +  "," + "U" + "," + str(agreement) + "," + str(round(exec_time,2))
+					print output
+					unsat_num = unsat_num + 1
+					return
 		else:
 			stack.append([len(stack)+1,0,0])
-		print "END OF LOOP\n"
+		#print "END OF LOOP\n"
 
 def backtrack(stack):
 	stack.pop()
 	if len(stack) == 0:
-		print "UNSATISFIABLE"
-		return [-1]
+		#print "UNSATISFIABLE"
+		return -1
 	else:
 		if stack[len(stack)-1][2] == 0:
 			stack[len(stack)-1][2] = 1
 			stack[len(stack)-1][1] = flip(stack[len(stack)-1][1])
 		else:
 			stack = backtrack(stack)
-			
+
 	return stack
 
 def verify(clauses, clause_truth_values):
@@ -126,16 +165,16 @@ def verify(clauses, clause_truth_values):
 				clause_truth_values[i] = -1
 			else:
 				clause_truth_values[i] = clause_truth_values[i] | variable
-	print "  Clause values computed:"
-	print "  " + str(clause_truth_values)
+	#print "  Clause values computed:"
+	#print "  " + str(clause_truth_values)
 	return clause_truth_values
 
+cnf_name = sys.argv[1]
+fs = open(cnf_name, 'r+') # open designated file
 
+csv_name = cnf_name[0:len(cnf_name)-4] + ".csv"
+sys.stdout=open(csv_name,"w")
 
-  		
-
-
-fs = open(sys.argv[1], 'r+') # open designated file
 clause_num = 0
 counter = 0
 wff_num = 0
@@ -162,3 +201,5 @@ for line in fs:
      
 try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected)
 print sys.argv[1].strip(".cnf") + "," + "kopp-fabian" + "," + str(wff_num) + "," + str(sat_num) + "," + str(unsat_num) + "," + str(ans_prov) + "," + str(correct_num)
+
+sys.stdout.close()
