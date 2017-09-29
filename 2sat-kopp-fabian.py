@@ -69,7 +69,7 @@ def try_values(temp_values, clause_num, var_num, prob_num, max_lit_num, expected
             dead_end = False
             if int(it) == i_opp:
               dead_end = True
-              break
+              continue
           if dead_end == True:
             break                    # breaks bring graph back one variable assignment
 
@@ -82,9 +82,9 @@ def try_values(temp_values, clause_num, var_num, prob_num, max_lit_num, expected
           solution = ""
           for i in range(1,var_num + 1): # calculate value based on DFS
             if i in marked:
-              solution = solution + "1"
+              solution = solution + ",1"
             else:
-              solution = solution + "0"
+              solution = solution + ",0"
 
           exec_time = time.time() - start_time
           sat_num = sat_num + 1
@@ -100,7 +100,7 @@ def try_values(temp_values, clause_num, var_num, prob_num, max_lit_num, expected
 
           output = str(prob_num) + "," + str(var_num) + "," + str(clause_num) + ","
           output = output + max_lit_num + "," + str(tot_lit_num) + ",S," + str(agreement) 
-          output = output + "," + str(round(exec_time, 6)) + "," + solution
+          output = output + "," + str(round(exec_time, 6)) + solution
           print output
           return
 
@@ -110,9 +110,9 @@ def try_values(temp_values, clause_num, var_num, prob_num, max_lit_num, expected
   if expected.strip() =="S":
     agreement = -1
     ans_prov = ans_prov + 1
-    correct_num = correct_num + 1
   elif expected.strip() == "U":
     ans_prov = ans_prov + 1
+    correct_num = correct_num + 2
     agreement = 1
   else:
     agreement = 0
