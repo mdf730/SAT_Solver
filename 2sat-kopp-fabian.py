@@ -110,9 +110,9 @@ def try_values(temp_values, clause_num, var_num, prob_num, max_lit_num, expected
   if expected.strip() =="S":
     agreement = -1
     ans_prov = ans_prov + 1
+    correct_num = correct_num + 1
   elif expected.strip() == "U":
     ans_prov = ans_prov + 1
-    correct_num = correct_num + 1
     agreement = 1
   else:
     agreement = 0
@@ -125,7 +125,11 @@ def try_values(temp_values, clause_num, var_num, prob_num, max_lit_num, expected
 
 # main function
 
-fs = open(sys.argv[1], 'r+') # open designated file
+cnf_name = sys.argv[1]
+fs = open(cnf_name, 'r+') # open designated file
+
+csv_name = cnf_name[0:len(cnf_name)-4] + ".csv"
+sys.stdout=open(csv_name,"w")    # write file to csv 
 
 clause_num = 0
 counter = 0
@@ -156,3 +160,5 @@ for line in fs:
 
 try_values(temp_values, clause_num, var_num, prob_num, max_lit_num, expected)
 print sys.argv[1].strip(".cnf") + "," + "kopp-fabian" + "," + str(wff_num) + "," + str(sat_num) + "," + str(unsat_num) + "," + str(ans_prov) + "," + str(correct_num)
+
+sys.stdout.close()
