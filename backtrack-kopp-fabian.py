@@ -172,7 +172,8 @@ def verify(clauses, clause_truth_values):
 cnf_name = sys.argv[1]
 fs = open(cnf_name, 'r+') # open designated file
 
-csv_name = cnf_name[0:len(cnf_name)-4] + ".csv"
+oldstdout = sys.stdout
+csv_name = cnf_name[0:len(cnf_name)-4] + "2.csv"
 sys.stdout=open(csv_name,"w")
 
 clause_num = 0
@@ -185,6 +186,10 @@ for line in fs:
     counter = 0
   if temp_line[0] == 'c':
     prob_num = temp_line[1]
+    sys.stdout.close()
+    sys.stdout = oldstdout
+    print prob_num
+    sys.stdout=open(csv_name,"a")
     lit_num = temp_line[2]
     expected = temp_line[3]
     wff_num = wff_num + 1

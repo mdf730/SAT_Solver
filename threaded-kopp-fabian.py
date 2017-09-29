@@ -2,6 +2,7 @@
 import sys
 import time
 import multiprocessing
+import itertools
 import functools
 
 # Define globals
@@ -20,7 +21,7 @@ def do_work(temp_values, var_num, start_time, expected, max_lit_num, i):
   global flag
 
   if flag == 1:
-    return
+    return 0
 
   binary = "0" + str(var_num) + "b"
   assignment = format(i,binary)
@@ -66,26 +67,24 @@ def do_work(temp_values, var_num, start_time, expected, max_lit_num, i):
   return 0
 
 
-
 def try_values(temp_values, clause_num, var_num, prob_num, max_lit_num, expected):
   global sat_num
   global unsat_num
   global ans_prov
   global correct_num
   global tot_lit_num
-  global flag
 
   start_time = time.time()
   
-  pool = multiprocessing.Pool(12)
+  pool = multiprocessing.Pool(8)
   subFunc = functools.partial(do_work, temp_values, var_num, start_time, expected, max_lit_num)
-  pool.imap(subFunc, (i for i in range(2**var_num)))
-
+  flag = itertools.chain.from_iterable(pool.imap(subFunc, (i for i in range(2**var_num))))
+  
   # for i in range(2**var_num):
   #   flag = flag | do_work(i, temp_values, var_num, start_time, expected, max_lit_num)
   #   if flag == 1:
   #     return
-
+  print "FLAG: "+str(flag)
   if flag == 0:
     if expected.strip() =="S":
       agreement = -1
