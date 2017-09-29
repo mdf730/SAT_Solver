@@ -2,13 +2,13 @@
 import sys
 import time
 
-
 # Define globals
 sat_num = 0
 unsat_num = 0
 ans_prov = 0
 correct_num = 0
 
+# Method used on a list to flip a bit value, 0<->1
 def flip(value):
 	if value == 0:
 		return 1
@@ -17,12 +17,14 @@ def flip(value):
 	else:
 		return -1
 
+# Similar purpose as in brute solver
 def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
-  	# Call variables as globals
+  	#Declare Globals
   	global sat_num
   	global unsat_num
   	global ans_prov
  	global correct_num
+
  	start_time = time.time() 
  	agreement = 0
 
@@ -36,8 +38,15 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
   	# Initialize stack data structure to contain lists of (variable, value, flag)
   	# flag is 0 if one value has been tried, 1 when both values have been tried
   	stack = [[1, 0, 0]]
+
+  	# Clauses will contain a copy of the current wff variables, with the known values
+  	# substituted in as a 0 or 1 and unknowns substituted as -1s.
   	clauses = []
+
+  	# This will contain a true or false value for each clause, or -1 if still undetermined
 	clause_truth_values = []
+
+	# This contains each variable that has already been assigned
 	assigned_vals = []
   	while len(stack) <= var_num:
   		#print "START OF LOOP"
@@ -90,6 +99,7 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 				failed = 1
 				satisfied = 0
 
+	    # Print output to .csv
 		if satisfied == 1:
 			#print clauses
 			#print clause_truth_values
@@ -115,6 +125,8 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 			print output
 			sat_num = sat_num + 1
 			return
+
+		# backtrack is recursive, flipping bits and popping variables
 		elif failed == 1:
 			#print "GO BACK"
 			if stack[len(stack)-1][2] == 0:
@@ -138,10 +150,14 @@ def try_values(temp_values, clause_num, var_num, prob_num, lit_num, expected):
 					print output
 					unsat_num = unsat_num + 1
 					return
+		# append the next value to the stack
 		else:
 			stack.append([len(stack)+1,0,0])
 		#print "END OF LOOP\n"
 
+# This pops a value from the stack. If the stack length is zero, the wff is unsatisfiable
+# If the variable hasn't had both values tried, flip the value and try again
+# otherwise, recursive call the function until a variable is found to flip or the stack is empty
 def backtrack(stack):
 	stack.pop()
 	if len(stack) == 0:
@@ -156,6 +172,7 @@ def backtrack(stack):
 
 	return stack
 
+# This fills the truth values based on the contents of clauses.
 def verify(clauses, clause_truth_values):
 	#print clauses
 	for i, line in enumerate(clauses):
@@ -169,6 +186,10 @@ def verify(clauses, clause_truth_values):
 	#print "  " + str(clause_truth_values)
 	return clause_truth_values
 
+
+# The code below is very similar to the brute program
+
+#MAIN 
 cnf_name = sys.argv[1]
 fs = open(cnf_name, 'r+') # open designated file
 
